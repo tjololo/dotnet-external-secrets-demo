@@ -1,0 +1,13 @@
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dotnet-external-secrets-demo
+spec:
+  entryPoints:
+    - web
+  routes:
+  - match: PathPrefix('/not-so-secret/')
+    kind: Rule
+    services:
+    - name: dotnet-external-secrets-demo
+      port: 80

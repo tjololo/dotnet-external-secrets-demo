@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dotnet-external-secrets-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dotnet-external-secrets-demo
+  template:
+    metadata:
+      labels:
+        app: dotnet-external-secrets-demo
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 5000
+        runAsGroup: 5000
+        fsGroup: 5000
+        seccompProfile:
+          type: RuntimeDefault
+      volumes:
+        - name: secrets-store
+          secret:
+            secretName: not-so-secret
+            items:
+              - key: my-secret-value
+                path: not-secret.txt
+      containers:
+      - name: dotnet-external-secrets-demo
+        image: ghcr.io/tjololo/dotnet-external-secrets-demo:latest
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          capabilities:
+            drop:
+              - ALL
+        ports:
+        - containerPort: 8080
+        env:
+        - name: NOT_SO_SECRET_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: not-so-secret
+              key: my-other-secret-value
+        volumeMounts:
+        - name: secrets-store
+          mountPath: "/mnt/secrets-store"
+          readOnly: true
