@@ -16,7 +16,7 @@ app.UseHttpsRedirection();
 
 app.MapGet("/not-so-secret/from-disk", async () =>
     {
-        const string secretFilePath = "/mnt/secrets-store/not-secret";
+        const string secretFilePath = "/mnt/secrets-store/not-secret.txt";
         
         if (!File.Exists(secretFilePath))
         {
